@@ -132,9 +132,9 @@ class Car:
         #     img.save(imgname)
         #     img.show()
         #     time.sleep(2)
-        # self.view = self.view[::2, ::2]
-        # self.view = np.expand_dims(self.view, 0)
-        # gView = self.view
+        self.view = self.view[::2, ::2]
+        self.view = np.expand_dims(self.view, 0)
+        gView = self.view
 
 # reward = 0
 # total_timesteps = 0
@@ -210,7 +210,7 @@ class Game:
         global distance_travelled
 
         rotation = action.item()
-        print(rotation)
+        $print(rotation)
         #print("act-",action.item())
         self.car.move(rotation)
         #self.car.x = self.car.position.x
@@ -363,11 +363,11 @@ class Game:
             distance_travelled=0
             done = True
             obs = self.reset()
-        print("episoderew - ",episode_reward)
+        $print("episoderew - ",episode_reward)
         if episode_reward<-2000:
             done=True
         
-        print(total_timesteps,max_timesteps)
+        $print(total_timesteps,max_timesteps)
         if total_timesteps < max_timesteps:
 
 
