@@ -125,16 +125,16 @@ class Car:
         self.view=tempSand
 
         #To check if cropped image is fine
-        if total_timesteps %50==10:
-            # print("image", self.angle)
-            img = PILImage.fromarray(np.uint8(self.view * 255) , 'L')
-            imgname="1.png"
-            img.save(imgname)
-            img.show()
-            time.sleep(2)
-        self.view = self.view[::2, ::2]
-        self.view = np.expand_dims(self.view, 0)
-        gView = self.view
+        # if total_timesteps %50==10:
+        #     # print("image", self.angle)
+        #     img = PILImage.fromarray(np.uint8(self.view * 255) , 'L')
+        #     imgname="1.png"
+        #     img.save(imgname)
+        #     img.show()
+        #     time.sleep(2)
+        # self.view = self.view[::2, ::2]
+        # self.view = np.expand_dims(self.view, 0)
+        # gView = self.view
 
 # reward = 0
 # total_timesteps = 0
@@ -477,10 +477,10 @@ obs=np.array([])
 new_obs=np.array([])
 evaluations=[]
 
-if load_model == True:
-    print("------------load model")
-    total_timesteps = max_timesteps
-    policy.load("%s" % (file_name), directory="./pytorch_models")
+# if load_model == True:
+#     print("------------load model")
+#     total_timesteps = max_timesteps
+#     policy.load("%s" % (file_name), directory="./pytorch_models")
 
         
 
