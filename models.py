@@ -214,7 +214,6 @@ class TD3(object):
 
     def train(self, replay_buffer, iterations, batch_size=100, discount=0.99, tau=0.005, policy_noise=0.2,
               noise_clip=0.5, policy_freq=2):
-        print("train started")
 
         for it in range(iterations):
 
@@ -274,8 +273,6 @@ class TD3(object):
                 # Step 15: Still once every two iterations, we update the weights of the Critic target by polyak averaging
                 for param, target_param in zip(self.critic.parameters(), self.critic_target.parameters()):
                     target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
-
-        print("end of train ")
 
     # Making a save method to save a trained model
     def save(self, filename, directory):
