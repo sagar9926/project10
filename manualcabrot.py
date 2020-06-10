@@ -1,9 +1,11 @@
+
 # Importing the libraries
 import numpy as np
 import os
 import time
 import torch
 import math 
+import matplotlib.pyplot as plt
 
 import os
 import pygame
@@ -12,7 +14,7 @@ from pygame.math import Vector2
 
 
 from PIL import Image as PILImage
-from models import ReplayBuffer, TD3
+from models1 import ReplayBuffer, TD3
 from scipy.ndimage import rotate
 
 
@@ -38,15 +40,9 @@ n_points = 0
 length = 0
 last_reward = 0
 origin_x = 743
-origin_y = 302
+origin_y = 380
 scores = []
-#im = CoreImage("./images/MASK1.png")
-
-# Some possible locations for pickup/drop points
-# coordinates = [[110,270],[200,280],[300,560],[320,475],[590, 275],\
-# [570,340],[635,580],[900, 380],[1065,470],[1100, 305],[1330,380],[1220,617],[1080,190]]
-#coordinates = [[1330,380],[1220,617],[1080,190]]
-coordinates = [[590,318],[756,126]]
+coordinates = [[590,380],[730,90],[1130,405],[120,300],[1110,630]]
 first_update = True # Setting the first update
 last_distance = 0   # Initializing the last distance
 
@@ -59,20 +55,20 @@ def init():
     sand = np.zeros((longueur, largeur))
     img = PILImage.open("mask.png").convert('L')
     sand = np.asarray(img) / 255
-    goal_x, goal_y = coordinates[np.random.randint(0, 2)]
+    goal_x, goal_y = coordinates[np.random.randint(0, 5)]
     # goal_x = 1220
-    # goal_y = 622
     first_update = False
 sandCount=0
 global gView
+
 class Car:
     cropsize = 28
     padsize = 28
     rotation = 0
     view = np.zeros([1,int(cropsize),int(cropsize)])
     
-    def __init__(self, x=743, y=302, angle=0.0, length=4, max_steering=30, max_acceleration=5.0):
-        self.position = Vector2(743,302)
+    def __init__(self, x=743, y=358, angle=0.0, length=4, max_steering=30, max_acceleration=5.0):
+        self.position = Vector2(743,358)
         self.velocity = Vector2(0.0, 0.0)
         self.angle = angle
         self.length = length
@@ -91,6 +87,7 @@ class Car:
         self.center = [234,245]
         self.velocity = [0,0]
         self.view = np.zeros([1,int(28),int(28)])
+        self.view2 = np.zeros([1,int(56),int(56)])
         #self.car = {'x':0,'y':0,'center':[234,245],'velocity':[0,0],'view':tc.view}
     # def update(self, dt):
     #     self.velocity += (self.acceleration * dt, 0)
@@ -109,20 +106,24 @@ class Car:
         global episode_num
         global padsize
         global cropsize
+        tempx,tempy = self.position.x , 660 - self.position.y
         self.position = Vector2(*self.velocity) + self.position
         self.rotation = rotation
         self.angle = self.angle + self.rotation
+        #print("angle",self.angle)
 
         # Preparing the image for the state
         tempSand = np.copy(sand)
-        tempSand = np.pad(tempSand,self.padsize,constant_values=1.0)
-        tempSand = tempSand[int(self.position.x) - self.cropsize + self.padsize:int(self.position.x) + self.cropsize + self.padsize,
-                   int(self.position.y) - self.cropsize + self.padsize:int(self.position.y) + self.cropsize + self.padsize]
+        #print(tempSand.shape)
+        tempSand = np.pad(tempSand,self.padsize,constant_values=1.0,mode = 'constant')
+        tempSand = tempSand[int(tempx) - self.cropsize + self.padsize:int(tempx) + self.cropsize + self.padsize,
+                   int(tempy) - self.cropsize + self.padsize:int(tempy) + self.cropsize + self.padsize]
         tempSand = rotate(tempSand, angle=90-(self.angle-90), reshape= False, order=1, mode='constant',  cval=1.0)
-        tempSand[int(self.padsize)-5:int(self.padsize), int(self.padsize) - 2:int(self.padsize) + 3 ] = 0.6
-        tempSand[int(self.padsize):int(self.padsize) + 5, int(self.padsize) - 2:int(self.padsize) + 3] = 0.3
+        tempSand[int(self.padsize)-5:int(self.padsize), int(self.padsize) - 2:int(self.padsize) + 3 ] = 0
+        tempSand[int(self.padsize):int(self.padsize) + 5, int(self.padsize) - 2:int(self.padsize) + 3] = 1
         # tempSand = rotate(tempSand, angle= self.angle-90, order = 1, reshape = False, mode = 'constant', cval = 1.0)
         self.view=tempSand
+        self.view2=tempSand
 
         #To check if cropped image is fine
         # if total_timesteps %50==10:
@@ -133,8 +134,13 @@ class Car:
         #     img.show()
         #     time.sleep(2)
         self.view = self.view[::2, ::2]
+        self.view2 = np.expand_dims(self.view2, 0)
         self.view = np.expand_dims(self.view, 0)
+        
         gView = self.view
+        return 90-(self.angle-90)
+        #return self.angle 
+
 
 # reward = 0
 # total_timesteps = 0
@@ -143,9 +149,9 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("Car tutorial")
-        width = 1429
+        width = 1200
         height = 660
-        self.sWidth=1429
+        self.sWidth=1200
         self.sHeight=660
         #tc=Car()
         self.screen = pygame.display.set_mode((width, height))
@@ -155,8 +161,16 @@ class Game:
         self.center = [234,245]
         self.car = Car()
         self.bg_img = pygame.image.load('MASK1.png')
+        self.bg_img = pygame.transform.scale(self.bg_img,(1200,660))
+        self.city_img = pygame.image.load('citymap.png')
+        self.city_img = pygame.transform.scale(self.city_img,(1200,690))
+        
         self.car_img = pygame.image.load('car.png')
-        self.car_img = pygame.transform.scale(self.car_img,(40,20))
+        self.car_img = pygame.transform.scale(self.car_img,(20,15))
+        
+        self.dest_img = pygame.image.load('destination.jpg')
+        self.dest_img = pygame.transform.scale(self.dest_img,(20,20))
+        
         #self.car = {'x':0,'y':0,'center':[234,245],'velocity':[0,0],'view':tc.view}
         #global reward
         global total_timesteps
@@ -169,11 +183,23 @@ class Game:
         self.car.velocity = Vector2(6, 0)
 
 
-    def runCarUi(self,carposx,carposy,desposx,desposy):
+    def runCarUi(self,carposx,carposy,desposx,desposy,tAngle):
         #self.screen.fill((255,255,255))
-        self.screen.blit(self.bg_img, self.bg_img.get_rect())
-        self.screen.blit(self.car_img,self.car.position) 
-        pygame.draw.rect(self.screen, (0, 255, 0), (desposx, desposy, 25,25)) 
+        
+        display_cam = np.copy(self.car.view2.squeeze())
+        display_cam2 = np.zeros([int(56),int(56),3])
+        display_cam2[:,:,0] = display_cam*255
+        display_cam2[:,:,1] = display_cam*255
+        display_cam2[:,:,2] = display_cam*255
+        display_cam3 = pygame.surfarray.make_surface(display_cam2)
+        
+        rot_img = pygame.transform.rotate(self.car_img,tAngle)
+        self.screen.blit(self.city_img, self.city_img.get_rect())
+        self.screen.blit(rot_img,self.car.position)
+        self.screen.blit(self.dest_img,(desposx, 660 - desposy))
+        self.screen.blit(display_cam3,(400,100)) 
+        #pygame.draw.rect(self.screen, (0, 255, 0), (desposx, 660 - desposy, 25,25)) 
+        
         pygame.display.flip()
 
     def reset(self):
@@ -181,15 +207,15 @@ class Game:
         global origin_x
         global origin_y
         self.car.position.x = origin_x
-        self.car.position.y  = origin_y
+        self.car.position.y  = 660 - origin_y
         xx = goal_x - self.car.position.x
-        yy = goal_y - self.car.position.y
+        yy = goal_y - (660 - self.car.position.y)
         tempAngle = -(180 / math.pi) * math.atan2(
-            self.car.velocity[0] * yy- self.car.velocity[1] * xx,
-            self.car.velocity[0]* xx + self.car.velocity[1] * yy)
+            self.car.velocity[0] * yy+ self.car.velocity[1] * xx,
+            self.car.velocity[0]* xx - self.car.velocity[1] * yy)
         orientation = tempAngle/180
         #orientation = Vector2(*self.car.velocity).angle((xx,yy))/180
-        self.distance = np.sqrt((self.car.position.x- goal_x) ** 2 + (self.car.position.y - goal_y) ** 2)
+        self.distance = np.sqrt((self.car.position.x- goal_x) ** 2 + ( 660 - self.car.position.y - goal_y) ** 2)
         
         # state = [self.car.view, orientation, -orientation]
         # state = [self.car.view, orientation, -orientation, self.distance]
@@ -210,41 +236,43 @@ class Game:
         global distance_travelled
 
         rotation = action.item()
-        $print(rotation)
+        #print(rotation)
         #print("act-",action.item())
-        self.car.move(rotation)
+        tAngle = self.car.move(rotation)
         #self.car.x = self.car.position.x
         #self.car.y = self.car.position.y
-        self.runCarUi(self.car.position.x,self.car.position.y,goal_x,goal_y)
+        self.runCarUi(self.car.position.x, 660 - self.car.position.y,goal_x,goal_y,tAngle)
         #print(self.car.x , goal_x,self.car.y , goal_y)
-        self.distance = np.sqrt((self.car.position.x - goal_x) ** 2 + (self.car.position.y - goal_y) ** 2)
+        self.distance = np.sqrt((self.car.position.x - goal_x) ** 2 + ( 660 - self.car.position.y - goal_y) ** 2)
         xx = goal_x - self.car.position.x
-        yy = goal_y - self.car.position.y
+        yy = goal_y - 660 + self.car.position.y
         tempAngle = -(180 / math.pi) * math.atan2(
-            self.car.velocity[0] * yy- self.car.velocity[1] * xx,
-            self.car.velocity[0]* xx + self.car.velocity[1] * yy)
+            self.car.velocity[0] * yy+ self.car.velocity[1] * xx,
+            self.car.velocity[0]* xx - self.car.velocity[1] * yy)
         orientation = tempAngle / 180.
         # state = [self.car.view, orientation, -orientation]
         # state = [self.car.view, orientation, -orientation, self.distance]
         state = [self.car.view, orientation, -orientation, last_distance-self.distance]
         #print(orientation, -orientation, last_distance,self.distance)
         # moving on the sand
-        if sand[int(self.car.position.x), int(self.car.position.y)] > 0:
-            self.car.velocity = Vector2(0.5, 0).rotate(self.car.angle)
-            last_reward = -5.0 #-1
+        if sand[int(self.car.position.x), int(660 - self.car.position.y)] > 0:
+            self.car.velocity = Vector2(1, 0).rotate(self.car.angle)
+            #print("sand")
+            last_reward = -5 #-1
             # sandCount+=1
             # distance_travelled-=1
 
         else:  # moving on the road
-            self.car.velocity = Vector2(1.5, 0).rotate(self.car.angle)
+            self.car.velocity = Vector2(2.5, 0).rotate(self.car.angle)
             last_reward = -1.5 #-0.2 # -2.0
+            #print("road")
             # distance_travelled+=0.5
             # if sandCount>0:
             #     sandCount-=1
 
             # moving towards the goal
             if self.distance < last_distance:
-                last_reward = 0.5 #0.1
+                last_reward = 1.5 #0.1
                 # distance_travelled=+1
                 # else:
                 #     last_reward = last_reward +(-0.2)
@@ -273,7 +301,7 @@ class Game:
             if self.topickup == 1:
                 origin_x = goal_x
                 origin_y = goal_y
-                goal_x,goal_y= coordinates[np.random.randint(0,2)]
+                goal_x,goal_y= coordinates[np.random.randint(0,5)]
                 # goal_x = 200
                 # goal_y = 100
                 self.drop['x'] = goal_x
@@ -288,7 +316,7 @@ class Game:
                 origin_y = goal_y
                 # goal_x = 1220
                 # goal_y = 622
-                goal_x,goal_y= coordinates[np.random.randint(0, 2)]
+                goal_x,goal_y= coordinates[np.random.randint(0, 5)]
                 self.pickup['x'] = goal_x
                 self.pickup['y'] = goal_y
                 self.topickup = 1
@@ -300,7 +328,7 @@ class Game:
         # Carry the passenger to the drop location
         if self.topickup == 0:
             self.pickup['x'] = self.car.position.x - 5
-            self.pickup['y'] = self.car.position.y - 5
+            self.pickup['y'] = 660 - self.car.position.y - 5
         # if sandCount>100:
             # done=True
             # last_reward=distance_travelled
@@ -350,7 +378,7 @@ class Game:
         global max_episode_steps
         global episode_timesteps
         global distance_travelled
-        self.width = 1429
+        self.width = 1200
         self.height = 660
         longueur = self.width
         largeur = self.height
@@ -363,11 +391,11 @@ class Game:
             distance_travelled=0
             done = True
             obs = self.reset()
-        $print("episoderew - ",episode_reward)
-        if episode_reward<-2000:
+        #print("episoderew - ",episode_reward)
+        if episode_reward<-2500:
             done=True
         
-        $print(total_timesteps,max_timesteps)
+        #print(total_timesteps,max_timesteps)
         if total_timesteps < max_timesteps:
 
 
@@ -386,8 +414,8 @@ class Game:
                     print("reached-")
                     timesteps_since_eval %= eval_freq
                     evaluations.append(self.evaluate_policy(policy))
-                    policy.save(file_name, directory="./pytorch_models")
-                    np.save("./results/%s" % (file_name), evaluations)
+                    policy.save(file_name, directory="/content/gdrive/My Drive/EndGame/pytorch_models")
+                    np.save("/content/gdrive/My Drive/EndGame/results/%s" % (file_name), evaluations)
 
                 # When the training step is done, we reset the state of the environment
                 obs = self.reset()
@@ -422,7 +450,7 @@ class Game:
             # We store the new transition into the Experience Replay memory (ReplayBuffer)
             replay_buffer.add((obs, new_obs, action, reward, done_bool))
             if total_timesteps%10==1:
-                print(" ".join([str(total_timesteps), str(obs[1:]), str(new_obs[1:]), str(action), str(reward), str(done_bool)]))
+              print(" ".join([str(total_timesteps), str(obs[1:]), str(new_obs[1:]), str(action), str(reward), str(done_bool)]))
             # We update the state, the episode timestep, the total timesteps, and the timesteps since the evaluation of the policy
             obs = new_obs
             episode_timesteps += 1
@@ -431,8 +459,8 @@ class Game:
             # Saving model at every 5000 iterations
             if total_timesteps%5000==1:
                 print("Saving Model %s" % (file_name))
-                policy.save("%s" % (file_name), directory="./pytorch_models")
-                np.save("./results/%s" % (file_name), evaluations)
+                policy.save("%s" % (file_name), directory="/content/gdrive/My Drive/EndGame/pytorch_models")
+                np.save("/content/gdrive/My Drive/EndGame/results/%s" % (file_name), evaluations)
         else:
             action = policy.select_action(np.array(obs))
             new_obs,reward, done = self.step(action)
@@ -443,9 +471,9 @@ class Game:
 
 
 # Initializing Global Variables
-start_timesteps = 3e3  # 1e4 Number of iterations/timesteps before which the model randomly chooses an action, and after which it starts to use the policy network
+start_timesteps = 1e4  # 1e4 Number of iterations/timesteps before which the model randomly chooses an action, and after which it starts to use the policy network
 eval_freq = 1e3  #5e3 How often the evaluation step is performed (after how many timesteps)
-max_timesteps = 5e4  #5e5 Total number of iterations/timesteps
+max_timesteps = 5e6  #5e5 Total number of iterations/timesteps
 
 expl_noise = 0.1  # Exploration noise - STD value of exploration Gaussian noise
 batch_size = 100  # Size of the batch
@@ -477,10 +505,11 @@ obs=np.array([])
 new_obs=np.array([])
 evaluations=[]
 
-# if load_model == True:
-#     print("------------load model")
-#     total_timesteps = max_timesteps
-#     policy.load("%s" % (file_name), directory="./pytorch_models")
+
+if load_model == True:
+    print("------------load model")
+    total_timesteps = max_timesteps
+    policy.load("%s" % (file_name), directory="./pytorch_models")
 
         
 
@@ -490,7 +519,8 @@ start_ticks=pygame.time.get_ticks()
 
 #parent.run()
 while True:
-    
+    pygame.event.get()
     parent.update(1/60)
     time.sleep(1/60) 
+
 
