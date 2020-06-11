@@ -219,12 +219,12 @@ class Critic(nn.Module):
 
     def Q1(self, img, state, u):
         x1 = img
-        for layer in self.encoder:
+        for layer in self.encoder_C1:
             x1 = layer(x1)
         # print(x.size())
         x1 = x1.view(-1, 16)
         x1u = torch.cat([x1, state,u], 1)
-        for layer in self.linear:
+        for layer in self.linear_C1:
             x1u = layer(x1u)
             # print(x.size())
         return x1u
