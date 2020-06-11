@@ -64,7 +64,7 @@ class Actor(nn.Module):
 
           
                 #Transition Block
-                nn.Conv2d(in_channels=18, out_channels=6, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x6
+                nn.Conv2d(in_channels=18, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x8
                 nn.ReLU(),
                 nn.MaxPool2d(2, 2),# output_size = 11x11x6
                 
