@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+state_dim = 4
 latent_dim = state_dim - 1 + 16
 
 
