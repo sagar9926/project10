@@ -97,7 +97,7 @@ class Actor(nn.Module):
         for layer in self.linear:
             x = layer(x)
             # print(x.size())
-        x = self.max_action * torch.tanh(self.layer_3(x))
+        x = self.max_action * torch.tanh(x)
         return x
 
 
