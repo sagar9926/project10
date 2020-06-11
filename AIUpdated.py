@@ -204,7 +204,6 @@ class Critic(nn.Module):
         for layer in self.linear_C1:
             x1u = layer(x1u)
             # print(x.size())
-        x1u = self.layer_3(x1u)
         
         # Forward-Propagation on the second Critic Neural Network
         x2 = img
@@ -216,7 +215,6 @@ class Critic(nn.Module):
         for layer in self.linear_C2:
             x2u = layer(x2u)
             # print(x.size())
-        x2u = self.layer_3(x2u)
         return x1u, x2u
 
     def Q1(self, img, state, u):
@@ -229,7 +227,6 @@ class Critic(nn.Module):
         for layer in self.linear:
             x1u = layer(x1u)
             # print(x.size())
-        x1u = self.layer_3(x1u)
         return x1u
 
 
