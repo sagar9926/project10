@@ -182,7 +182,7 @@ class Critic(nn.Module):
                 #Convolution Block 1
                 nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3, 3), padding=0, bias=False),# output_size = 26x26x6
                 nn.ReLU(),
-                nn.BatchNorm2d(6),
+                nn.BatchNorm2d(8),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 2
