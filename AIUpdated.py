@@ -130,7 +130,7 @@ class Critic(nn.Module):
                 #Convolution Block 2
                 nn.Conv2d(in_channels=8, out_channels=10, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x12
                 nn.ReLU(),
-                nn.BatchNorm2d(12),
+                nn.BatchNorm2d(10),
                 nn.Dropout2d(0.1),
           
                 #Convolution Block 3
@@ -188,7 +188,7 @@ class Critic(nn.Module):
                 #Convolution Block 2
                 nn.Conv2d(in_channels=8, out_channels=10, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x12
                 nn.ReLU(),
-                nn.BatchNorm2d(12),
+                nn.BatchNorm2d(10),
                 nn.Dropout2d(0.1),
           
                 #Convolution Block 3
@@ -206,13 +206,13 @@ class Critic(nn.Module):
                 #Convolution Block 4
                 nn.Conv2d(in_channels=8, out_channels=10,kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
                 nn.ReLU(),
-                nn.BatchNorm2d(16),
+                nn.BatchNorm2d(10),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 5
                 nn.Conv2d(in_channels=10, out_channels=12, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
                 nn.ReLU(),
-                nn.BatchNorm2d(24),
+                nn.BatchNorm2d(12),
                 nn.Dropout2d(0.1),
                       
           
