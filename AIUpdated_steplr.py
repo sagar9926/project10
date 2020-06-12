@@ -296,12 +296,12 @@ class TD3(object):
         self.actor_target = Actor(state_dim, action_dim, max_action).to(device)
         self.actor_target.load_state_dict(self.actor.state_dict())
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters())
-        self.actor_scheduler = StepLR(self.actor_optimizer, step_size=2500, gamma=0.5)
+        self.actor_scheduler = torch.optim.lr_scheduler.StepLR(self.actor_optimizer, step_size=2500, gamma=0.5)
         self.critic = Critic(state_dim, action_dim).to(device)
         self.critic_target = Critic(state_dim, action_dim).to(device)
         self.critic_target.load_state_dict(self.critic.state_dict())
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters())
-        self.critic_scheduler = StepLR(self.critic_optimizer, step_size=5000, gamma=0.5)
+        self.critic_scheduler = torch.optim.lr_scheduler.StepLR(self.critic_optimizer, step_size=5000, gamma=0.5)
         self.max_action = max_action
 
     def select_action(self, state):
