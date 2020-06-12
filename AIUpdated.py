@@ -45,57 +45,59 @@ class Actor(nn.Module):
         self.encoder = nn.ModuleList([
                 
                 #Convolution Block 1
-                nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3, 3), padding=0, bias=False),# output_size = 26x26x6
+                nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3, 3), padding=0, bias=False),# output_size = 26x26x8
                 nn.ReLU(),
                 nn.BatchNorm2d(8),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 2
-                nn.Conv2d(in_channels=8, out_channels=10, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x12
+                nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x16
                 nn.ReLU(),
-                nn.BatchNorm2d(10),
+                nn.BatchNorm2d(16),
                 nn.Dropout2d(0.1),
            
                 #Convolution Block 3
-                #nn.Conv2d(in_channels=12, out_channels=18, kernel_size=(3, 3), padding=0, bias=False),# output_size = 22x22x18
-                #nn.ReLU(),
-                #nn.BatchNorm2d(18),
-                #nn.Dropout2d(0.1),
+                nn.Conv2d(in_channels=16, out_channels=24, kernel_size=(3, 3), padding=0, bias=False),# output_size = 22x22x24
+                nn.ReLU(),
+                nn.BatchNorm2d(24),
+                nn.Dropout2d(0.1),
 
           
                 #Transition Block
-                nn.Conv2d(in_channels=10, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x8
+                nn.Conv2d(in_channels=24, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x8
                 nn.ReLU(),
-                nn.MaxPool2d(2, 2),# output_size = 11x11x6
+                nn.MaxPool2d(2, 2),# output_size = 11x11x8
                 
                 #Convolution Block 4
-                nn.Conv2d(in_channels=8, out_channels=10, kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
+                nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
                 nn.ReLU(),
-                nn.BatchNorm2d(10),
+                nn.BatchNorm2d(16),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 5
-                nn.Conv2d(in_channels=10, out_channels=12, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
+                nn.Conv2d(in_channels=16, out_channels=24, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
                 nn.ReLU(),
-                nn.BatchNorm2d(12),
+                nn.BatchNorm2d(24),
                 nn.Dropout2d(0.1),
                       
           
                 #Convolution Block 6
-                #nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x32
-                #nn.ReLU(),
-                #nn.BatchNorm2d(12),
-                #nn.Dropout2d(0.1),
+                nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x32
+                nn.ReLU(),
+                nn.BatchNorm2d(32),
+                nn.Dropout2d(0.1),
                 
                 #Convolution Block 6
-                nn.Conv2d(in_channels=12, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
+                nn.Conv2d(in_channels=32, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
                 
                 nn.AdaptiveAvgPool2d((1,1)),
                 ])
     
     
         self.linear = torch.nn.ModuleList([ 
-                nn.Linear(latent_dim, 400),
+                nn.Linear(latent_dim, 200),
+                nn.ReLU(),
+                nn.Linear(200, 400),
                 nn.ReLU(),
                 nn.Linear(400, 300),
                 nn.ReLU(),
@@ -124,57 +126,59 @@ class Critic(nn.Module):
         self.encoder_C1 = nn.ModuleList([
                 
                 #Convolution Block 1
-                nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3, 3), padding=0, bias=False),# output_size = 26x26x6
+                nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3, 3), padding=0, bias=False),# output_size = 26x26x8
                 nn.ReLU(),
                 nn.BatchNorm2d(8),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 2
-                nn.Conv2d(in_channels=8, out_channels=10, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x12
+                nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x16
                 nn.ReLU(),
-                nn.BatchNorm2d(10),
+                nn.BatchNorm2d(16),
                 nn.Dropout2d(0.1),
           
                 #Convolution Block 3
-                #nn.Conv2d(in_channels=12, out_channels=18, kernel_size=(3, 3), padding=0, bias=False),# output_size = 22x22x18
-                #nn.ReLU(),
-                #nn.BatchNorm2d(18),
-                #nn.Dropout2d(0.1),
+                nn.Conv2d(in_channels=16, out_channels=24, kernel_size=(3, 3), padding=0, bias=False),# output_size = 22x22x24
+                nn.ReLU(),
+                nn.BatchNorm2d(24),
+                nn.Dropout2d(0.1),
 
           
                 #Transition Block
-                nn.Conv2d(in_channels=10, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x8
+                nn.Conv2d(in_channels=24, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x8
                 nn.ReLU(),
                 nn.MaxPool2d(2, 2),# output_size = 11x11x8
                 
                 #Convolution Block 4
-                nn.Conv2d(in_channels=8, out_channels=10, kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
+                nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
                 nn.ReLU(),
-                nn.BatchNorm2d(10),
+                nn.BatchNorm2d(16),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 5
-                nn.Conv2d(in_channels=10, out_channels=12, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
+                nn.Conv2d(in_channels=16, out_channels=24, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
                 nn.ReLU(),
-                nn.BatchNorm2d(12),
+                nn.BatchNorm2d(24),
                 nn.Dropout2d(0.1),
                       
           
                 #Convolution Block 6
-                #nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x32
-                #nn.ReLU(),
-                #nn.BatchNorm2d(12),
-                #nn.Dropout2d(0.1),
+                nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x32
+                nn.ReLU(),
+                nn.BatchNorm2d(32),
+                nn.Dropout2d(0.1),
                 
                 #Convolution Block 6
-                nn.Conv2d(in_channels=12, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
+                nn.Conv2d(in_channels=32, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
                 
                 nn.AdaptiveAvgPool2d((1,1)),
                 ])
     
     
         self.linear_C1 = torch.nn.ModuleList([ 
-                nn.Linear(latent_dim + action_dim, 400),
+                nn.Linear(latent_dim + action_dim, 200),
+                nn.ReLU(),
+                nn.Linear(200, 400),
                 nn.ReLU(),
                 nn.Linear(400, 300), 
                 nn.ReLU(),
@@ -184,47 +188,47 @@ class Critic(nn.Module):
         self.encoder_C2 = nn.ModuleList([
                 
                 #Convolution Block 1
-                nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3, 3), padding=0, bias=False),# output_size = 26x26x6
+                nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3, 3), padding=0, bias=False),# output_size = 26x26x8
                 nn.ReLU(),
                 nn.BatchNorm2d(8),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 2
-                nn.Conv2d(in_channels=8, out_channels=10, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x12
+                nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 24x24x16
                 nn.ReLU(),
-                nn.BatchNorm2d(10),
+                nn.BatchNorm2d(16),
                 nn.Dropout2d(0.1),
           
                 #Convolution Block 3
-                #nn.Conv2d(in_channels=12, out_channels=18, kernel_size=(3, 3), padding=0, bias=False),# output_size = 22x22x18
-                #nn.ReLU(),
-                #nn.BatchNorm2d(18),
-                #nn.Dropout2d(0.1),
+                nn.Conv2d(in_channels=16, out_channels=24, kernel_size=(3, 3), padding=0, bias=False),# output_size = 22x22x24
+                nn.ReLU(),
+                nn.BatchNorm2d(24),
+                nn.Dropout2d(0.1),
 
           
                 #Transition Block
-                nn.Conv2d(in_channels=10, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x8
+                nn.Conv2d(in_channels=24, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),# output_size = 22x22x8
                 nn.ReLU(),
                 nn.MaxPool2d(2, 2),# output_size = 11x11x8
                 
                 #Convolution Block 4
-                nn.Conv2d(in_channels=8, out_channels=10,kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
+                nn.Conv2d(in_channels=8, out_channels=16,kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
                 nn.ReLU(),
-                nn.BatchNorm2d(10),
+                nn.BatchNorm2d(16),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 5
-                nn.Conv2d(in_channels=10, out_channels=12, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
+                nn.Conv2d(in_channels=16, out_channels=24, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
                 nn.ReLU(),
-                nn.BatchNorm2d(12),
+                nn.BatchNorm2d(24),
                 nn.Dropout2d(0.1),
                       
           
                 #Convolution Block 6
-                #nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x32
-                #nn.ReLU(),
-                #nn.BatchNorm2d(12),
-                #nn.Dropout2d(0.1),
+                nn.Conv2d(in_channels=24, out_channels=32, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x32
+                nn.ReLU(),
+                nn.BatchNorm2d(32),
+                nn.Dropout2d(0.1),
                 
                 #Convolution Block 6
                 nn.Conv2d(in_channels=12, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
@@ -234,7 +238,9 @@ class Critic(nn.Module):
     
     
         self.linear_C2 = torch.nn.ModuleList([ 
-                nn.Linear(latent_dim + action_dim, 400), 
+                nn.Linear(latent_dim + action_dim, 200), 
+                nn.ReLU(),
+                nn.Linear(200, 400),
                 nn.ReLU(),
                 nn.Linear(400, 300),
                 nn.ReLU(),
