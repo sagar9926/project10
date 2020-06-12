@@ -231,7 +231,7 @@ class Critic(nn.Module):
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 6
-                nn.Conv2d(in_channels=12, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
+                nn.Conv2d(in_channels=32, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
                 
                 nn.AdaptiveAvgPool2d((1,1)),
                 ])
