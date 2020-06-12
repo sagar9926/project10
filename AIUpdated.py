@@ -204,13 +204,13 @@ class Critic(nn.Module):
                 nn.MaxPool2d(2, 2),# output_size = 11x11x8
                 
                 #Convolution Block 4
-                nn.Conv2d(in_channels=8, out_channels=10ernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
+                nn.Conv2d(in_channels=8, out_channels=10,kernel_size=(3, 3), padding=0, bias=False),# output_size = 9x9x16
                 nn.ReLU(),
                 nn.BatchNorm2d(16),
                 nn.Dropout2d(0.1),
                 
                 #Convolution Block 5
-                nn.Conv2d(in_channels=12 out_channels=, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
+                nn.Conv2d(in_channels=10, out_channels=12, kernel_size=(3, 3), padding=0, bias=False),# output_size = 7x7x24
                 nn.ReLU(),
                 nn.BatchNorm2d(24),
                 nn.Dropout2d(0.1),
@@ -223,7 +223,7 @@ class Critic(nn.Module):
                 #nn.Dropout2d(0.1),
                 
                 #Convolution Block 6
-                nn.Conv2d(in_channels=24, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
+                nn.Conv2d(in_channels=12, out_channels=16, kernel_size=(3, 3), padding=0, bias=False),# output_size = 5x5x16
                 
                 nn.AdaptiveAvgPool2d((1,1)),
                 ])
