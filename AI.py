@@ -95,10 +95,10 @@ class Actor(nn.Module):
     
     
         self.linear = torch.nn.ModuleList([ 
-                nn.Linear(latent_dim, 400),
+                nn.Linear(latent_dim, 200),
                 nn.ReLU(),
-                #nn.Linear(200, 400),
-                #nn.ReLU(),
+                nn.Linear(200, 400),
+                nn.ReLU(),
                 nn.Linear(400, 300),
                 nn.ReLU(),
                 nn.Linear(300, action_dim),
@@ -176,10 +176,10 @@ class Critic(nn.Module):
     
     
         self.linear_C1 = torch.nn.ModuleList([ 
-                nn.Linear(latent_dim + action_dim, 400),
+                nn.Linear(latent_dim + action_dim, 200),
                 nn.ReLU(),
-                #nn.Linear(200, 400),
-                #nn.ReLU(),
+                nn.Linear(200, 400),
+                nn.ReLU(),
                 nn.Linear(400, 300), 
                 nn.ReLU(),
                 nn.Linear(300, 1),
@@ -238,10 +238,10 @@ class Critic(nn.Module):
     
     
         self.linear_C2 = torch.nn.ModuleList([ 
-                nn.Linear(latent_dim + action_dim, 400), 
+                nn.Linear(latent_dim + action_dim, 200),
                 nn.ReLU(),
-                #nn.Linear(200, 400),
-                #nn.ReLU(),
+                nn.Linear(200, 400),
+                nn.ReLU(),
                 nn.Linear(400, 300),
                 nn.ReLU(),
                 nn.Linear(300,1),
