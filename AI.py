@@ -296,12 +296,12 @@ class TD3(object):
         self.actor_target = Actor(state_dim, action_dim, max_action).to(device)
         self.actor_target.load_state_dict(self.actor.state_dict())
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters())
-        self.actor_scheduler = torch.optim.lr_scheduler.StepLR(self.actor_optimizer, step_size=2500, gamma=0.5)
+        #self.actor_scheduler = torch.optim.lr_scheduler.StepLR(self.actor_optimizer, step_size=2500, gamma=0.5)
         self.critic = Critic(state_dim, action_dim).to(device)
         self.critic_target = Critic(state_dim, action_dim).to(device)
         self.critic_target.load_state_dict(self.critic.state_dict())
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters())
-        self.critic_scheduler = torch.optim.lr_scheduler.StepLR(self.critic_optimizer, step_size=5000, gamma=0.5)
+        #self.critic_scheduler = torch.optim.lr_scheduler.StepLR(self.critic_optimizer, step_size=5000, gamma=0.5)
         self.max_action = max_action
 
     def select_action(self, state):
@@ -364,7 +364,7 @@ class TD3(object):
             self.critic_optimizer.zero_grad()
             critic_loss.backward()
             self.critic_optimizer.step()
-            self.critic_scheduler.step()
+            #self.critic_scheduler.step()
 
             # Step 13: Once every two iterations, we update our Actor model by performing gradient ascent on the output of the first Critic model
             if it % policy_freq == 0:
@@ -372,7 +372,7 @@ class TD3(object):
                 self.actor_optimizer.zero_grad()
                 actor_loss.backward()
                 self.actor_optimizer.step()
-                self.actor_scheduler.step()
+                #self.actor_scheduler.step()
 
                 # Step 14: Still once every two iterations, we update the weights of the Actor target by polyak averaging
                 for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
